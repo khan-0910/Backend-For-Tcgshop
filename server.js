@@ -31,21 +31,25 @@ const razorpay = new Razorpay({
 
 // Product
 const productSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  stock: Number,
-  description: String,
-  image: String,
-  marketPrice: Number,
-  marketUrl: String,
-  marketSource: String,
-  category: {
-    type: String,
-    enum: ['single-cards', 'sealed-bundles', 'booster-boxes', 'collection-boxes'],
-    default: 'single-cards'
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+    name: { type: String, required: true },
+    price: { type: Number, required: true },
+    stock: { type: Number, required: true, default: 0 },
+    description: { type: String, required: true },
+    image: { type: String, required: true },
+
+    // OPTIONAL market fields (fix admin page)
+    marketPrice: { type: Number, default: 0 },
+    marketUrl: { type: String, default: '' },
+    marketSource: { type: String, default: '' },
+
+    category: {
+        type: String,
+        enum: ['single-cards', 'sealed-bundles', 'booster-boxes', 'collection-boxes'],
+        default: 'single-cards'
+    },
+
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -216,3 +220,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🐸 Froakie TCG backend running on port ${PORT}`);
 });
+
