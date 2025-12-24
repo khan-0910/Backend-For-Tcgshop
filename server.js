@@ -52,6 +52,7 @@ const productSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+
 const Product = mongoose.model('Product', productSchema);
 
 // Order
@@ -115,6 +116,71 @@ app.get('/api/products/:id', async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) return res.status(404).json({ success: false });
   res.json({ success: true, product });
+});
+
+// CREATE PRODUCT (ADMIN)
+app.post('/api/products', async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error('Create product error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// UPDATE PRODUCT (ADMIN)
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: Date.now() },
+      { new: true }
+    );
+    if (!product) return res.status(404).json({ success: false });
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error('Update product error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// DELETE PRODUCT (ADMIN)
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) return res.status(404).json({ success: false });
+    res.json({ success: true, message: 'Product deleted' });
+  } catch (error) {
+    console.error('Delete product error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/* ==================== ORDERS (ADMIN) ==================== */
+
+// GET ALL ORDERS (ADMIN)
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.error('Get orders error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET SINGLE ORDER (ADMIN)
+app.get('/api/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ success: false });
+    res.json({ success: true, order });
+  } catch (error) {
+    console.error('Get order error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 /* ==================== CREATE ORDER (FIXED) ==================== */
@@ -220,4 +286,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🐸 Froakie TCG backend running on port ${PORT}`);
 });
-
